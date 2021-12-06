@@ -1,5 +1,5 @@
 import { Link, routes } from '@redwoodjs/router'
-import { Form, TextField, Submit, TextAreaField, FieldError} from '@redwoodjs/forms'
+import { Form, TextField, Submit, TextAreaField, FieldError, FormError, useForm} from '@redwoodjs/forms'
 import { useMutation } from '@redwoodjs/web'
 import {Toaster, toast} from "@redwoodjs/web/toast"
 
@@ -15,20 +15,25 @@ const ContactPage = () => {
   const [create, {loading, error}] = useMutation(CREATE_CONTACT, {
     onCompleted: () => {
       toast.success("Thank you for your submission!")
+      formMethods.reset()
     }
   })
-
+  const formMethods = useForm({mode: 'onBlur'})
   const onSubmit = (data) => {
     create({variables: { input: data}})
   }
 
-  console.log("Loading state: ", loading);
 
 
   return (
     <>
     <Toaster />
-    <Form onSubmit={onSubmit} config={{mode: 'onBlur'}}>
+    <Form onSubmit={onSubmit} error={error} formMethods={formMethods}>
+      <FormError
+        error={error}
+        wrapperStyle={{ color: 'red', backgroundColor: 'lavenderblush' }}
+      />
+
       <label htmlFor="name">Name</label>
       <TextField name="name" validation={{required: true}} errorClassName="error" />
       <FieldError name="name" className="error" />
